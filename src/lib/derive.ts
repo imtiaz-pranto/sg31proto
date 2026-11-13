@@ -428,7 +428,6 @@ export interface OfferView {
   categories: string[]
   products: string[]
   levelLabel?: string
-  vendor: string | null
   origin: 'everyday' | 'campaignOnly'
 }
 
@@ -503,23 +502,23 @@ export function offerView(state: AppState, key: OfferKey, campaign: Campaign | n
         products = s.products
       }
     }
-    return { ref: key, mode, title: c.title, moduleId: 'smart-coupons', chip: MODULE_CHIP['smart-coupons'], detail: couponDetail(c, state), categories, products, vendor: null, origin: base.origin }
+    return { ref: key, mode, title: c.title, moduleId: 'smart-coupons', chip: MODULE_CHIP['smart-coupons'], detail: couponDetail(c, state), categories, products, origin: base.origin }
   }
   if (key.moduleId === 'bogo') {
     const base = state.bogoRules.find((x) => x.id === key.offerId)
     if (!base) return null
     const r = withOverride(base, ref)
     const s = scopeToProducts(state, r.buyScope)
-    return { ref: key, mode, title: r.name, moduleId: 'bogo', chip: MODULE_CHIP.bogo, detail: bogoDetail(state, r), categories: s.categories, products: s.products, levelLabel: r.level === 'storeWide' ? 'Store-wide rule' : 'Product rule', vendor: r.owner === 'vendor' ? r.vendorName : null, origin: base.origin }
+    return { ref: key, mode, title: r.name, moduleId: 'bogo', chip: MODULE_CHIP.bogo, detail: bogoDetail(state, r), categories: s.categories, products: s.products, levelLabel: r.level === 'storeWide' ? 'Store-wide rule' : 'Product rule', origin: base.origin }
   }
   const base = state.orderBumps.find((x) => x.id === key.offerId)
   if (!base) return null
   const b = withOverride(base, ref)
   // The bump changes the price of its offer product, so that product is part of the scope too.
-  return { ref: key, mode, title: b.name, moduleId: 'order-bump', chip: MODULE_CHIP['order-bump'], detail: bumpDetail(state, b), categories: b.targets.categories, products: [...b.targets.products, b.offerProductId], vendor: null, origin: base.origin }
+  return { ref: key, mode, title: b.name, moduleId: 'order-bump', chip: MODULE_CHIP['order-bump'], detail: bumpDetail(state, b), categories: b.targets.categories, products: [...b.targets.products, b.offerProductId], origin: base.origin }
 }
 
-/** Every everyday admin offer, for the Attach existing drawer. Vendor deals and campaign-only offers never appear. */
+/** Every everyday offer, for the Attach existing drawer. Campaign-only offers never appear. */
 export function everydayOffers(state: AppState): OfferView[] {
   const keys: OfferKey[] = [
     ...state.coupons.map((c) => ({ moduleId: 'smart-coupons' as const, offerId: c.id })),
@@ -529,7 +528,7 @@ export function everydayOffers(state: AppState): OfferView[] {
   return keys
     .map((k) => offerView(state, k))
     .filter((x): x is OfferView => x !== null)
-    .filter((x) => x.vendor === null && x.origin === 'everyday')
+    .filter((x) => x.origin === 'everyday')
 }
 
 export function campaignOffers(state: AppState, c: Campaign): OfferView[] {

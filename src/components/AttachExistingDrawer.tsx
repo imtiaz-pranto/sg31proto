@@ -128,10 +128,6 @@ export function AttachExistingDrawer({ open, onClose, campaign, onCustomise }: P
             ))}
           </>
         )}
-
-        <div className="border-t pt-3 text-xs text-gray-500" style={{ borderColor: '#e5e7eb' }}>
-          Deals created by vendors can't be added to campaigns.
-        </div>
       </div>
     </Drawer>
   )

@@ -86,14 +86,13 @@ export function BogoPage() {
                       {coupon && !onlyWith && <ModuleChip name={`Used by coupon: ${coupon.title}`} />}
                       {onlyWith && <ModuleChip name={`Only with coupon: ${onlyWith.title}`} />}
                       {status === 'paused' && <span className="chip chip-warn">Paused: needs Smart Coupons</span>}
-                      {r.owner === 'vendor' && <ModuleChip name={`Vendor: ${r.vendorName}`} />}
                       <TimelineChip k={{ moduleId: 'bogo', offerId: r.id }} />
                       <CampaignOnlyChip offer={r} />
                     </span>
                   </td>
                   <td className="text-right">
                     <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDrawer({ open: true, ruleId: r.id, version: null })}>
-                      {r.owner === 'vendor' ? 'View' : 'Edit'}
+                      Edit
                     </button>
                   </td>
                 </tr>

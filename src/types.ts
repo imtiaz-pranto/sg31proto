@@ -161,8 +161,6 @@ export interface BogoRule extends OfferBase {
   id: string
   name: string
   level: 'storeWide' | 'product'
-  owner: 'admin' | 'vendor'
-  vendorName: string | null
   buyQty: number
   buyScope: string
   getQty: number
@@ -194,7 +192,6 @@ export interface Product {
   price: number
   category: string
   ownCountdown: { percent: number; end: string } | null
-  vendor: string | null
 }
 
 export type MilestoneReward = { kind: 'freeShipping' } | { kind: 'coupon'; couponId: string } | { kind: 'gift'; productId: string }

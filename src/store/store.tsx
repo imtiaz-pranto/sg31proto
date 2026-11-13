@@ -6,7 +6,7 @@ import { SEED_NOW, emptyCart, makeSeedState } from '../data/seed'
 import { addDays, newId, nowOf, offerOf, refIn, sameKey, slugify, todayOf } from '../lib/derive'
 import type { AppState, BogoRule, Campaign, CampaignPrice, CartRewardsConfig, EditBackup, FreeLimitModule, Licence, Milestone, ModuleId, OfferKey, OfferRef, OrderBump, PreviewCart, Settings, SmartCoupon, SurfaceId, TemplateId } from '../types'
 
-const STORAGE_KEY = 'sg31-proto-v32'
+const STORAGE_KEY = 'sg31-proto-v33'
 
 type Updater = (fn: (s: AppState) => AppState) => void
 
@@ -547,7 +547,7 @@ function makeActions(update: Updater) {
     cartSync(seen: NonNullable<PreviewCart['seen']>, notices: string[]) {
       update((s) => ({ ...s, preview: { ...s.preview, seen, notices: notices.length ? notices : s.preview.notices } }))
     },
-    /** Coupon rules 4 and 9: drop codes the arbiter rejected, with their notices. */
+    /** Coupon rules 4 and 8: drop codes the arbiter rejected, with their notices. */
     rejectCodes(codes: string[], notices: string[]) {
       update((s) => ({ ...s, preview: { ...s.preview, codes: s.preview.codes.filter((c) => !codes.includes(c)), notices: [...s.preview.notices, ...notices] } }))
     },

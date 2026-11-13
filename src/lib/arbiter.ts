@@ -1,4 +1,4 @@
-// Discount arbiter for the storefront preview. Brief v3.1 section 3c.
+// Discount arbiter for the storefront preview. Brief v3.2 section 3c.
 // Every deal is read through effectiveOffer() at the prototype time.
 
 import type { AppState, BogoRule, CartLine, Milestone, OrderBump, Product, SmartCoupon } from '../types'
@@ -79,7 +79,7 @@ export interface CartResult {
   freeShipping: boolean
   unlockedCoupons: SmartCoupon[]
   nudges: string[]
-  /** Codes the arbiter drops (rules 4 and 9), with their notices. */
+  /** Codes the arbiter drops (rules 4 and 8), with their notices. */
   rejected: { code: string; notice: string }[]
 }
 
@@ -240,7 +240,7 @@ export function priceCart(state: AppState, lines: CartLine[], opts: PreviewOptio
       }
     }
     for (const { rule: r, campaignId, campaignName } of rules) {
-      const moduleName = r.owner === 'vendor' ? `${MODULE_NAMES.bogo} · Vendor: ${r.vendorName}` : MODULE_NAMES.bogo
+      const moduleName = MODULE_NAMES.bogo
       const cand = bogoCandidate(state, r, p, lines[i].qty, { id: `bogo:${r.id}`, title: r.name, moduleName, campaignId, campaignName, fromCampaignOrCoupon: campaignId !== null, code: null, fixedCartId: null })
       if (cand) candidates.push(cand)
     }
@@ -304,7 +304,7 @@ export function priceCart(state: AppState, lines: CartLine[], opts: PreviewOptio
     priced.push({ product: p, qty: lines[i].qty, regular: p.price, base: base.unit, baseLabel: base.label, unit, gross, net: round2(gross - discount), steps, applied, caption, losers })
   }
 
-  // Rule 9: a code that loses on every line it applies to is removed. Rule 4: two codes that can't combine keep the larger.
+  // Rule 8: a code that loses on every line it applies to is removed. Rule 4: two codes that can't combine keep the larger.
   const rejected: { code: string; notice: string }[] = []
   const codeCoupons = coupons.filter((c) => c.coupon.method !== 'automatic' && opts.codes.includes(c.coupon.code.toUpperCase()))
   const savings = new Map<string, number>()

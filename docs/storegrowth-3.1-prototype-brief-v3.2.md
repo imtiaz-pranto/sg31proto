@@ -78,9 +78,8 @@ The prototype lets stakeholders click through the merchant experience. It valida
 
 These are decisions, not suggestions. The prototype demonstrates each one.
 
-1. **Campaigns is Pro-only and admin-only.**
+1. **Campaigns is Pro-only.**
    - With Free or an expired licence, the Campaigns page shows in a locked preview state (S1 Free).
-   - Deals created by a vendor never appear in the Attach offer drawer. The drawer shows a footnote saying so (section 6).
 2. **The link attribution window is 7 days.**
    - The report card shows it as "orders within 7 days of a link visit".
    - It is editable in Settings, as a number field with a default of 7.
@@ -169,9 +168,8 @@ The storefront preview demonstrates every point below. The arbiter always works 
    - If both are codes, the smaller is removed with the notice "Only one of these coupons can be used. We kept [CODE], which saves you more."
 5. **Order Bump.** An Order Bump discount applies only to the bump line and is outside the competition.
 6. **Cart Rewards.** A reward applies whenever its threshold is met and never competes with line discounts. Thresholds are re-checked on every cart change, including quantity changes and removals.
-7. **Vendor deals.** These take part like any other deal.
-8. **Other WooCommerce coupons.** These stack with a Smart Coupon only if that coupon has "Allow with other coupons" on. Their own "Individual use" setting is respected.
-9. **A code that loses everywhere.** A code coupon that loses on every line it applies to is removed with the notice "[CODE] wasn't applied because [deal] saves you more." A code that wins on some lines stays on those lines.
+7. **Other WooCommerce coupons.** These stack with a Smart Coupon only if that coupon has "Allow with other coupons" on. Their own "Individual use" setting is respected.
+8. **A code that loses everywhere.** A code coupon that loses on every line it applies to is removed with the notice "[CODE] wasn't applied because [deal] saves you more." A code that wins on some lines stays on those lines.
 
 **Cart preview captions:**
 - When the referee picked a winner on a line: "Larger deal applied: [name]".
@@ -336,7 +334,6 @@ Which campaigns an offer is attached to is derived from `Campaign.offerRefs`. Of
 **BogoRule:**
 - `id`, `name`
 - `level`: `storeWide | product`
-- `owner`: `admin | vendor`, plus `vendorName`
 - `buyQty`, `buyScope`, `getQty`, `getScope`
 - `getDiscount`: `free | percent`
 - `usedByCouponId`: nullable
@@ -493,7 +490,6 @@ See `Main.dc.html` (empty) and `Ready.dc.html` (filled).
   - windows don't overlap: Attach is enabled
   - windows overlap: Attach is disabled with the reason from section 6
 - Locked modules appear per section 3a.
-- The drawer footnote reads "Deals created by vendors can't be added to campaigns." The footnote shows only in this drawer, not on the page.
 
 **The rail**
 
@@ -685,7 +681,6 @@ Follows Shopify's discount form order, with one card per section and a right rai
 - "Used by coupon: [title]"
 - "Only with coupon: [title]" when the coupon's method is code or link
 - "Paused: needs Smart Coupons" when the rule is paused
-- "Vendor: [store name]" on vendor rules
 - the timeline chip, when attached to a campaign
 - "Made for [campaign]" for rules made for a campaign
 
@@ -746,7 +741,7 @@ One page with four panels. It is reachable from "Preview storefront" in the "⋯
    - A free gift line at $0 when a gift milestone is reached.
    - A checkout step showing Order Bumps that can be ticked.
    - Cart notices when the prototype time crosses a campaign start or end, or a campaign is paused, deleted or stopped (section 3e).
-   - A coupon code field. Coupon notices follow section 3c, rules 4 and 9.
+   - A coupon code field. Coupon notices follow section 3c, rules 4 and 8.
 4. **Sales pop toast:** "Someone in [city] bought [product]."
 
 **Preview toggle:** "Also apply 30% off Outerwear". This forces that coupon on for the arbiter demo, even when it isn't live.
@@ -784,7 +779,7 @@ Use these strings verbatim.
 | S5 after choosing a rule | "Deal defined by BOGO rule: [rule name]" + link "Edit deal" |
 | S5 code or link method with a rule | "This BOGO rule will only apply when shoppers use this coupon." |
 | S6 top banner | "Need a code, a link or usage limits on a BOGO deal? Create it as a Smart Coupon." |
-| S6 rule chips | "Used by coupon: [title]" / "Only with coupon: [title]" / "Paused: needs Smart Coupons" / "Vendor: [store name]" |
+| S6 rule chips | "Used by coupon: [title]" / "Only with coupon: [title]" / "Paused: needs Smart Coupons" |
 | S2 "Worth a look", BOGO and coupon | "A BOGO rule and a Buy X get Y coupon both target [product]. The larger one wins." |
 | S2 "Worth a look", campaign price | "[n] product(s) already have their own Countdown discount. The campaign price replaces it while the campaign runs." Singular and plural handled. |
 | S2 campaign price, product with its own Countdown | "[Product]'s own [n]% Countdown pauses while this runs, then comes back." |
@@ -795,7 +790,6 @@ Use these strings verbatim.
 | S2 drawer, offer in another campaign, no overlap | "In [campaign], [dates]." + button "Attach" |
 | S2 drawer, offer in another campaign, overlap | "In [campaign], [dates]. Campaign dates can't overlap for the same offer." Attach disabled. |
 | S2 dates saved into an overlap | "[Offer] is already in [campaign] ([dates]). Campaign dates can't overlap for the same offer." |
-| S2 drawer footnote | "Deals created by vendors can't be added to campaigns." |
 | S2 Cart rewards bar row | "Your Cart Rewards milestones, with campaign copy on the bar" |
 | S2 Offers drawer group labels | "Smart Coupons", "BOGO", "Order Bump" |
 | S2 overlap warning | "[Campaign] also discounts [n] products in this campaign. The larger deal applies." + "See products" |
@@ -965,12 +959,11 @@ Active everyday coupons in creation order, oldest first: SCARFDUO, NEXT10, SAVE3
 
 ### BOGO rules
 
-| Rule | Level | Owner | Everyday status | Links |
-|---|---|---|---|---|
-| Buy 2 boots get 1 free | Store-wide (Boots) | Admin | Off | Used by BF Boots; attached to November Boots Week |
-| Buy 1 scarf get 1 at 50% | Product (Scarf) | Admin | Active | Used by SCARFDUO, so only with that coupon |
-| Buy 1 beanie get 1 at 50% | Product (Wool Beanie) | Admin | Off | Attached to Black Friday 2026 |
-| Buy 2 socks get 1 free | Product (Wool Socks) | Vendor "North Trail Co." | Active | Never shown in the offer drawer |
+| Rule | Level | Everyday status | Links |
+|---|---|---|---|
+| Buy 2 boots get 1 free | Store-wide (Boots) | Off | Used by BF Boots; attached to November Boots Week |
+| Buy 1 scarf get 1 at 50% | Product (Scarf) | Active | Used by SCARFDUO, so only with that coupon |
+| Buy 1 beanie get 1 at 50% | Product (Wool Beanie) | Off | Attached to Black Friday 2026 |
 
 ### Order Bumps
 
@@ -999,7 +992,7 @@ Active everyday coupons in creation order, oldest first: SCARFDUO, NEXT10, SAVE3
 | Wool Beanie | $25 | Accessories | None |
 | Scarf | $30 | Accessories | None |
 | Leather Gloves | $40 | Accessories | 20%, ends Dec 31, 23:59 |
-| Wool Socks | $15 | Accessories | None (vendor product) |
+| Wool Socks | $15 | Accessories | None |
 
 ### Orders by store display
 
@@ -1056,7 +1049,7 @@ A draft with unsaved changes asks "Leave without saving?" when you leave it. Whe
    - Click "Enable Stock bar", see that warning clear, and see the Stock count bar row move above the "Not available" divider.
 3. **Attaching an offer.**
    - In Black Friday 2026, step 2, click Add offer, then Attach an existing offer.
-   - See offers grouped as Smart Coupons, BOGO and Order Bump, and see the vendor footnote. "Buy 2 socks get 1 free" is not listed.
+   - See offers grouped as Smart Coupons, BOGO and Order Bump.
    - Attach "Add Leather Gloves, 25% off", choose "Customise for this campaign" and set 40%.
    - See Products (step 4) update to include Leather Gloves, and the row tagged "Attached · Customised" with "Everyday: 25% off · During this campaign: 40% off" and the line "Live now · Black Friday 2026 takes over Nov 27, 12:00 AM to Dec 1, 11:59 PM · back to everyday after".
    - Click Save draft.
@@ -1152,7 +1145,6 @@ A draft with unsaved changes asks "Leave without saving?" when you leave it. Whe
 
 ## 11. Out of scope
 
-- Dokan vendor campaigns, and any vendor screens
 - Email or SMS of any kind
 - Store credit, gift cards and bulk unique codes
 - Product bundles and frequently bought together
@@ -1170,7 +1162,6 @@ A draft with unsaved changes asks "Leave without saving?" when you leave it. Whe
 
 ## 13. Decided after the code audit
 
-- **Dokan:** when an admin Smart Coupon beats a vendor BOGO on a vendor product, the marketplace funds the discount, following Dokan's admin-coupon setting where one exists.
 - **Multi-currency:** base currency only in 3.1, documented.
 - **Archived:** there is no archived campaign status.
 - The GitHub issues for the 3.1 build hold the full list of decisions.

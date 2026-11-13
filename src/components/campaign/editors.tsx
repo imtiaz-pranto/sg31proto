@@ -455,13 +455,11 @@ export function PriceEditor({ c, readOnly, startOpen = false }: EditorProps & { 
         <fieldset className="m-0 flex flex-col gap-1.5 border-0 p-0">
           <legend className="cp-label mb-1.5 p-0">Products</legend>
           <div className="flex flex-wrap gap-2">
-            {state.products
-              .filter((p) => !p.vendor)
-              .map((p) => (
-                <ChipToggle key={p.id} on={draft.products.includes(p.id)} onClick={() => toggle('products', p.id)}>
-                  {p.name}
-                </ChipToggle>
-              ))}
+            {state.products.map((p) => (
+              <ChipToggle key={p.id} on={draft.products.includes(p.id)} onClick={() => toggle('products', p.id)}>
+                {p.name}
+              </ChipToggle>
+            ))}
           </div>
         </fieldset>
         <p className="cp-muted m-0 text-[13px]">Products' own Countdown settings are kept and return after the campaign.</p>

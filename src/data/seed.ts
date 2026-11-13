@@ -11,12 +11,12 @@ export const LICENCE_EXPIRES_AT = '2026-12-04T00:00'
 export const categories = ['Jackets', 'Boots', 'Accessories']
 
 export const products: Product[] = [
-  { id: 'p-jacket', name: 'Field Jacket', price: 120, category: 'Jackets', ownCountdown: { percent: 10, end: '2026-12-31T23:59' }, vendor: null },
-  { id: 'p-boots', name: 'Trail Boots', price: 95, category: 'Boots', ownCountdown: null, vendor: null },
-  { id: 'p-beanie', name: 'Wool Beanie', price: 25, category: 'Accessories', ownCountdown: null, vendor: null },
-  { id: 'p-scarf', name: 'Scarf', price: 30, category: 'Accessories', ownCountdown: null, vendor: null },
-  { id: 'p-gloves', name: 'Leather Gloves', price: 40, category: 'Accessories', ownCountdown: { percent: 20, end: '2026-12-31T23:59' }, vendor: null },
-  { id: 'p-socks', name: 'Wool Socks', price: 15, category: 'Accessories', ownCountdown: null, vendor: 'North Trail Co.' },
+  { id: 'p-jacket', name: 'Field Jacket', price: 120, category: 'Jackets', ownCountdown: { percent: 10, end: '2026-12-31T23:59' } },
+  { id: 'p-boots', name: 'Trail Boots', price: 95, category: 'Boots', ownCountdown: null },
+  { id: 'p-beanie', name: 'Wool Beanie', price: 25, category: 'Accessories', ownCountdown: null },
+  { id: 'p-scarf', name: 'Scarf', price: 30, category: 'Accessories', ownCountdown: null },
+  { id: 'p-gloves', name: 'Leather Gloves', price: 40, category: 'Accessories', ownCountdown: { percent: 20, end: '2026-12-31T23:59' } },
+  { id: 'p-socks', name: 'Wool Socks', price: 15, category: 'Accessories', ownCountdown: null },
 ]
 
 /** Seed fact: how many products in each category are already on sale in WooCommerce. */
@@ -89,10 +89,9 @@ export const coupons: SmartCoupon[] = [
 const everyday = { origin: 'everyday' as const, campaignOnlyOf: null }
 
 export const bogoRules: BogoRule[] = [
-  { ...everyday, id: 'r-boots', createdAt: '2026-07-01T09:00', name: 'Buy 2 boots get 1 free', level: 'storeWide', owner: 'admin', vendorName: null, buyQty: 2, buyScope: 'Boots', getQty: 1, getScope: 'Boots', getDiscount: 'free', getPercent: 100, status: 'off', usedByCouponId: 'c-bfboots' },
-  { ...everyday, id: 'r-scarf', createdAt: '2026-08-20T09:00', name: 'Buy 1 scarf get 1 at 50%', level: 'product', owner: 'admin', vendorName: null, buyQty: 1, buyScope: 'p-scarf', getQty: 1, getScope: 'p-scarf', getDiscount: 'percent', getPercent: 50, status: 'active', usedByCouponId: 'c-scarfduo' },
-  { ...everyday, id: 'r-beanie', createdAt: '2026-10-10T09:00', name: 'Buy 1 beanie get 1 at 50%', level: 'product', owner: 'admin', vendorName: null, buyQty: 1, buyScope: 'p-beanie', getQty: 1, getScope: 'p-beanie', getDiscount: 'percent', getPercent: 50, status: 'off', usedByCouponId: null },
-  { ...everyday, id: 'r-socks', createdAt: '2026-09-12T09:00', name: 'Buy 2 socks get 1 free', level: 'product', owner: 'vendor', vendorName: 'North Trail Co.', buyQty: 2, buyScope: 'p-socks', getQty: 1, getScope: 'p-socks', getDiscount: 'free', getPercent: 100, status: 'active', usedByCouponId: null },
+  { ...everyday, id: 'r-boots', createdAt: '2026-07-01T09:00', name: 'Buy 2 boots get 1 free', level: 'storeWide', buyQty: 2, buyScope: 'Boots', getQty: 1, getScope: 'Boots', getDiscount: 'free', getPercent: 100, status: 'off', usedByCouponId: 'c-bfboots' },
+  { ...everyday, id: 'r-scarf', createdAt: '2026-08-20T09:00', name: 'Buy 1 scarf get 1 at 50%', level: 'product', buyQty: 1, buyScope: 'p-scarf', getQty: 1, getScope: 'p-scarf', getDiscount: 'percent', getPercent: 50, status: 'active', usedByCouponId: 'c-scarfduo' },
+  { ...everyday, id: 'r-beanie', createdAt: '2026-10-10T09:00', name: 'Buy 1 beanie get 1 at 50%', level: 'product', buyQty: 1, buyScope: 'p-beanie', getQty: 1, getScope: 'p-beanie', getDiscount: 'percent', getPercent: 50, status: 'off', usedByCouponId: null },
 ]
 
 export const orderBumps: OrderBump[] = [

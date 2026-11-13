@@ -17,7 +17,7 @@ interface Props {
 }
 
 function blankRule(campaignOnlyOf: string | null = null, now = ''): BogoRule {
-  return { id: newId('r'), origin: campaignOnlyOf ? 'campaignOnly' : 'everyday', campaignOnlyOf, createdAt: now, name: '', level: 'storeWide', owner: 'admin', vendorName: null, buyQty: 2, buyScope: 'Boots', getQty: 1, getScope: 'Boots', getDiscount: 'free', getPercent: 100, status: 'active', usedByCouponId: null }
+  return { id: newId('r'), origin: campaignOnlyOf ? 'campaignOnly' : 'everyday', campaignOnlyOf, createdAt: now, name: '', level: 'storeWide', buyQty: 2, buyScope: 'Boots', getQty: 1, getScope: 'Boots', getDiscount: 'free', getPercent: 100, status: 'active', usedByCouponId: null }
 }
 
 /** S6 rule form, in a drawer. Edits the everyday version, a campaign version, or creates a campaign-only rule. */
@@ -86,7 +86,7 @@ export function BogoRuleDrawer({ open, ruleId, versionCampaignId = null, campaig
             <button type="button" className="btn btn-ghost" onClick={() => onClose()}>
               Discard
             </button>
-            <button type="button" className="btn btn-blue" onClick={save} disabled={rule.owner === 'vendor'}>
+            <button type="button" className="btn btn-blue" onClick={save}>
               Save {versionCampaignId ? 'campaign version' : 'rule'}
             </button>
           </>
@@ -101,7 +101,6 @@ export function BogoRuleDrawer({ open, ruleId, versionCampaignId = null, campaig
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {rule.owner === 'vendor' && <div className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">Vendor: {rule.vendorName}. Vendor rules are read-only here and can't join campaigns.</div>}
           <Field label="Rule name" htmlFor="bogo-name">
             <input id="bogo-name" className="input" value={rule.name} onChange={(e) => set({ name: e.target.value })} placeholder="Buy 2 boots get 1 free" />
           </Field>

@@ -54,7 +54,7 @@ export function StorefrontPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveKey, cartState.seen === null, cartState.lines.length])
 
-  // Coupon rules 4 and 9: drop rejected codes, with their notices.
+  // Coupon rules 4 and 8: drop rejected codes, with their notices.
   const rejectedKey = cart.rejected.map((r) => r.code).join(',')
   useEffect(() => {
     if (cart.rejected.length) actions.rejectCodes(cart.rejected.map((r) => r.code), cart.rejected.map((r) => r.notice))
@@ -154,7 +154,6 @@ export function StorefrontPage() {
                 </div>
                 <div className="mt-1 text-sm text-gray-500">
                   {product.category}
-                  {product.vendor && ` · Sold by ${product.vendor}`}
                 </div>
                 <div className="mt-3 flex flex-wrap items-baseline gap-2">
                   {single.unit < product.price ? (
