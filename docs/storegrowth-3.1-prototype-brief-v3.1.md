@@ -636,6 +636,8 @@ Used in:
 
 Use these strings verbatim.
 
+Updated Nov 13, 2026 to match the copy changes in the campaign page redesign brief (section 8). The full merged spec is brief v3.2.
+
 | Place | Copy |
 |---|---|
 | S5 type card, active | "Buy X get Y · uses the BOGO module" |
@@ -644,30 +646,33 @@ Use these strings verbatim.
 | S5 code or link method with a rule | "This BOGO rule will only apply when shoppers use this coupon." |
 | S6 top banner | "Need a code, a link or usage limits on a BOGO deal? Create it as a Smart Coupon." |
 | S6 rule chips | "Used by coupon: [title]" / "Only with coupon: [title]" / "Paused: needs Smart Coupons" / "Vendor: [store name]" |
-| S2 readiness, BOGO and coupon | "A BOGO rule and a Buy X get Y coupon both target [product]. The larger one wins." |
-| S2 readiness, campaign price | "[n] product(s) already have their own Countdown discount. The campaign price replaces it while the campaign runs." Singular and plural handled. |
+| S2 "Worth a look", BOGO and coupon | "A BOGO rule and a Buy X get Y coupon both target [product]. The larger one wins." |
+| S2 "Worth a look", campaign price | "[n] product(s) already have their own Countdown discount. The campaign price replaces it while the campaign runs." Singular and plural handled. |
+| S2 campaign price, product with its own Countdown | "[Product]'s own [n]% Countdown pauses while this runs, then comes back." |
 | S2 campaign price note | "Products' own Countdown settings are kept and return after the campaign." |
-| S2 Add offer choices | "Attach existing offer" / "Create campaign-only offer" |
+| S2 Add offer choices | "Attach an existing offer" / "Create a new offer" |
 | S2 attach mode | "Use as is" / "Customise for this campaign" |
-| S2 offer tags | "Attached" / "Campaign-only" |
+| S2 offer tags | "Made for this campaign" / "Attached · Used as is" / "Attached · Customised" |
 | S2 drawer, offer in another campaign, no overlap | "In [campaign], [dates]." + button "Attach" |
 | S2 drawer, offer in another campaign, overlap | "In [campaign], [dates]. Campaign dates can't overlap for the same offer." Attach disabled. |
 | S2 dates saved into an overlap | "[Offer] is already in [campaign] ([dates]). Campaign dates can't overlap for the same offer." |
 | S2 drawer footnote | "Deals created by vendors can't be added to campaigns." |
-| S2 Cart Rewards surface row | "Uses your Cart Rewards milestones. Shows campaign copy on the bar." |
+| S2 Cart rewards bar row | "Your Cart Rewards milestones, with campaign copy on the bar" |
 | S2 Offers drawer group labels | "Smart Coupons", "BOGO", "Order Bump" |
 | S2 overlap warning | "[Campaign] also discounts [n] products in this campaign. The larger deal applies." + "See products" |
 | S2 overlap info line | "Also running: [campaign]" |
-| S2 delete confirm | "Delete [campaign]? Attached offers go back to their everyday versions." / "These campaign-only offers will be deleted: [names]." |
-| S2 remove campaign-only offer | "Remove [offer] from [campaign]?" + "Delete it" / "Keep as everyday offer" |
-| S2 paused strip | "Paused since [date]. Offers are back to their everyday versions and surfaces are off." |
-| Timeline chip, before | "Live now · [Campaign] takes over [start] to [end] · back to everyday after" (or "Off now · …") |
+| S2 delete confirm | "Delete [campaign]? Attached offers go back to their everyday versions." / "These offers made for this campaign will be deleted: [names]." |
+| S2 remove an offer made for this campaign | "Remove [offer] from [campaign]?" + "Delete it" / "Keep as everyday offer" |
+| S2 paused strip | "Paused since [date, time]" / "Offers are back to their everyday versions and store displays are off. Resume before [end] to finish the campaign." |
+| Timeline chip, before | "Live now · [Campaign] takes over [start] to [end] · back to everyday after" / "Off now · [Campaign] turns it on [start] to [end] · back to everyday after" |
 | Timeline chip, during | "[Campaign] version · until [end]" |
 | Module page banner | "[Campaign] is controlling [offer] until [end]. Changes here apply after it ends." + "Edit [Campaign] version" |
-| Edit drawer headers | "Everyday version" / "[Campaign] version" / "Campaign-only: [Campaign]" |
+| Edit drawer headers | "Everyday version" / "[Campaign] version" / "Made for [Campaign]" |
+| Used in, and module page chips | "Made for [Campaign]" |
 | Cart notice, ended | "[Campaign] ended. Prices updated." |
 | Cart notice, started | "[Campaign] price applied." |
 | Locked row, module off | "[Module] is off. Enable it to use it here." |
+| S2 locked store display row | "The [module] module is off. Turn it on to use it here." + button "Enable [module]" |
 | Locked option, Pro | "[Option] is a Pro feature." |
 | S1 Free banner | "Campaigns is a StoreGrowth Pro feature. This is a preview with sample data." |
 | S1 expired banner | "Your StoreGrowth Pro licence has expired, so your campaigns are stopped. Renew it to run them again." |
@@ -686,8 +691,14 @@ Use these strings verbatim.
 | List badge, licence | "Stopped: licence expired" |
 | Over Free limit chip | "Paused: over Free limit" |
 | Over Free limit notice | "You have more offers than the Free plan allows. Choose which stay on." + "Choose offers" |
-| Store during campaign | "Store during campaign: [revenue], [+/-x]% a day vs the 30 days before" / "All store orders in the window. Context only, not credited to the campaign." |
+| Whole store during campaign | "Your whole store during this campaign: [revenue] so far, [+/-x]% a day vs the 30 days before" / "All store orders in the window. Context only, not credited to the campaign." |
 | Prototype time pill | "Prototype time: [date, time]" |
+| S2 store displays card title | "Show it on your store" |
+| Counts, checklists, At a glance, list columns | "store displays" (never "surfaces") |
+| S2 readiness card title | "Ready to publish?" / "Ready to publish" |
+| S2 required checks | "Set a start date" / "Add an offer, a campaign price or a store display" / "End date is before start date" |
+| Report metric labels | "Revenue from this campaign" / "Orders" / "Offer acceptance" / "Average order value" |
+| Report chart title | "What led to the sale" + caption "Orders, by the last campaign display the shopper used" |
 
 **Rule for all copy:** a thing that comes from another module always shows that module's name.
 

@@ -4,9 +4,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { SEED_NOW, emptyCart, makeSeedState } from '../data/seed'
 import { addDays, newId, nowOf, offerOf, refIn, sameKey, slugify, todayOf } from '../lib/derive'
-import type { AppState, BogoRule, Campaign, CampaignPrice, CartRewardsConfig, FreeLimitModule, Licence, Milestone, ModuleId, OfferKey, OfferRef, OrderBump, PreviewCart, Settings, SmartCoupon, SurfaceId, TemplateId } from '../types'
+import type { AppState, BogoRule, Campaign, CampaignPrice, CartRewardsConfig, EditBackup, FreeLimitModule, Licence, Milestone, ModuleId, OfferKey, OfferRef, OrderBump, PreviewCart, Settings, SmartCoupon, SurfaceId, TemplateId } from '../types'
 
-const STORAGE_KEY = 'sg31-proto-v31'
+const STORAGE_KEY = 'sg31-proto-v32'
 
 type Updater = (fn: (s: AppState) => AppState) => void
 
@@ -27,7 +27,7 @@ function loadState(): AppState {
     const raw = sessionStorage.getItem(STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as AppState
-      if (parsed && Array.isArray(parsed.campaigns) && parsed.licence && parsed.now) return { ...parsed, toasts: [] }
+      if (parsed && Array.isArray(parsed.campaigns) && parsed.licence && parsed.now) return { ...parsed, editBackups: parsed.editBackups ?? {}, toasts: [] }
     }
   } catch {
     /* fall through to seed */
@@ -98,6 +98,47 @@ function copyCampaignOnly(s: AppState, key: OfferKey, campaignId: string): { sta
   }
 }
 
+// ---------- save state: unsaved-edit snapshots ----------
+
+function snapshot(s: AppState, c: Campaign): EditBackup {
+  return { campaign: c, coupons: s.coupons, bogoRules: s.bogoRules, orderBumps: s.orderBumps }
+}
+
+/** Everything Save draft covers: the campaign itself plus the offers made for it. */
+function draftSignature(s: AppState, c: Campaign): string {
+  const own = (o: { campaignOnlyOf: string | null }) => o.campaignOnlyOf === c.id
+  return JSON.stringify([{ ...c, savedAt: undefined }, s.coupons.filter(own), s.bogoRules.filter(own), s.orderBumps.filter(own)])
+}
+
+/**
+ * Runs after every store update. The first change to a draft since its last save keeps a snapshot of how
+ * things were, so the page can show unsaved changes and "Leave without saving" can put them back.
+ * Updates that manage the snapshots themselves (save, cancel, reset seed) are left alone.
+ */
+function trackDrafts(prev: AppState, next: AppState): AppState {
+  if (next === prev || next.editBackups !== prev.editBackups) return next
+  let backups = next.editBackups
+  for (const c of next.campaigns) {
+    if (c.status !== 'draft' || backups[c.id]) continue
+    const before = prev.campaigns.find((x) => x.id === c.id)
+    if (!before || before.status !== 'draft') continue
+    if (draftSignature(prev, before) !== draftSignature(next, c)) backups = { ...backups, [c.id]: snapshot(prev, before) }
+  }
+  return backups === next.editBackups ? next : { ...next, editBackups: backups }
+}
+
+function dropBackup(s: AppState, id: string): AppState {
+  const editBackups = { ...s.editBackups }
+  delete editBackups[id]
+  return { ...s, editBackups }
+}
+
+/** A campaign needs a name and a link once it is saved or published. */
+function namedAndLinked(c: Campaign): Partial<Campaign> {
+  const name = c.name.trim() || 'Untitled campaign'
+  return { name, linkSlug: c.linkSlug || slugify(name) }
+}
+
 function withToast(s: AppState, text: string, action?: { label: string; to: string }): AppState {
   return { ...s, toasts: [...s.toasts, { id: toastSeq++, text, action }] }
 }
@@ -122,8 +163,8 @@ export const TEMPLATES: {
   needs: ModuleId[]
 }[] = [
   { id: 'flash-sale', name: 'Flash sale', offer: 'campaignPrice', offerLine: 'Campaign price, 20% (Countdown)', surfaces: ['countdown', 'floatingBar', 'badge', 'flyCart'], excludeOnSale: true, needs: ['countdown', 'floating-bar', 'fly-cart'] },
-  { id: 'black-friday', name: 'Black Friday', offer: 'percentage', offerLine: 'Campaign-only Smart Coupon, percentage, automatic', surfaces: ['countdown', 'floatingBar', 'badge', 'salesPop', 'flyCart', 'cartRewardsBar'], excludeOnSale: true, needs: ['smart-coupons', 'countdown', 'floating-bar', 'sales-pop', 'fly-cart', 'cart-rewards'] },
-  { id: 'clearance', name: 'Clearance', offer: 'percentage', offerLine: 'Campaign-only Smart Coupon, percentage, automatic, exclude on-sale off', surfaces: ['badge', 'stockBar', 'flyCart'], excludeOnSale: false, needs: ['smart-coupons', 'stock-bar', 'fly-cart'] },
+  { id: 'black-friday', name: 'Black Friday', offer: 'percentage', offerLine: 'Smart Coupon, percentage, automatic', surfaces: ['countdown', 'floatingBar', 'badge', 'salesPop', 'flyCart', 'cartRewardsBar'], excludeOnSale: true, needs: ['smart-coupons', 'countdown', 'floating-bar', 'sales-pop', 'fly-cart', 'cart-rewards'] },
+  { id: 'clearance', name: 'Clearance', offer: 'percentage', offerLine: 'Smart Coupon, percentage, automatic, exclude on-sale off', surfaces: ['badge', 'stockBar', 'flyCart'], excludeOnSale: false, needs: ['smart-coupons', 'stock-bar', 'fly-cart'] },
   { id: 'launch-week', name: 'Launch week', offer: null, offerLine: 'None', surfaces: ['countdown', 'floatingBar', 'badge', 'salesPop'], excludeOnSale: true, needs: ['countdown', 'floating-bar', 'sales-pop'] },
   { id: 'always-on-free-shipping', name: 'Always-on free shipping', offer: null, offerLine: 'None', note: 'Uses your Cart Rewards milestones', surfaces: ['cartRewardsBar', 'flyCart'], excludeOnSale: true, needs: ['cart-rewards', 'fly-cart'] },
   { id: 'blank', name: 'Blank', offer: null, offerLine: 'None', surfaces: [], excludeOnSale: true, needs: [] },
@@ -235,14 +276,16 @@ function makeActions(update: Updater) {
       update((s) => {
         const t = TEMPLATES.find((x) => x.id === templateId)!
         const today = todayOf(s)
-        const name = t.id === 'blank' ? 'Untitled campaign' : `${t.name} ${today.slice(0, 4)}`
+        // Blank opens an empty draft: no name, no dates. Templates keep their pre-filled name and dates.
+        const blank = t.id === 'blank'
+        const name = blank ? '' : `${t.name} ${today.slice(0, 4)}`
         const c: Campaign = {
           id,
           name,
           templateId,
           status: 'draft',
-          start: `${today}T00:00`,
-          end: t.id === 'always-on-free-shipping' ? null : `${addDays(today, 7)}T23:59`,
+          start: blank ? null : `${today}T00:00`,
+          end: blank || t.id === 'always-on-free-shipping' ? null : `${addDays(today, 7)}T23:59`,
           offerRefs: [],
           campaignPrice: null,
           surfaces: {},
@@ -263,20 +306,49 @@ function makeActions(update: Updater) {
     updateCampaign(id: string, patch: Partial<Campaign>) {
       update((s) => patchCampaign(s, id, patch))
     },
+    /** Save draft: keeps the changes, names and links the campaign if needed, and stamps the save time. */
+    saveDraft(id: string) {
+      update((s) => dropBackup(patchCampaign(s, id, (c) => ({ ...namedAndLinked(c), savedAt: Date.now() })), id))
+    },
+    /** A Setup edit drawer opened: remember how things are, so Cancel can put them back. */
+    beginEdit(id: string) {
+      update((s) => {
+        const c = s.campaigns.find((x) => x.id === id)
+        return !c || s.editBackups[id] ? s : { ...s, editBackups: { ...s.editBackups, [id]: snapshot(s, c) } }
+      })
+    },
+    /** Keep the edits made since the snapshot. */
+    commitEdit(id: string) {
+      update((s) => (s.editBackups[id] ? dropBackup(s, id) : s))
+    },
+    /** "Leave without saving" and Cancel: put the campaign and the offers back as they were. */
+    cancelEdit(id: string) {
+      update((s) => {
+        const b = s.editBackups[id]
+        if (!b) return s
+        return dropBackup({ ...s, campaigns: s.campaigns.map((c) => (c.id === id ? b.campaign : c)), coupons: b.coupons, bogoRules: b.bogoRules, orderBumps: b.orderBumps }, id)
+      })
+    },
+    /** Publishing also saves the draft. */
     publish(id: string) {
       update((s) =>
-        patchCampaign(s, id, (c) => ({
-          status: c.start && c.start > nowOf(s) ? 'scheduled' : 'running',
-          publishedOn: todayOf(s),
-          metrics: c.metrics ?? { revenue: 0, orders: 0, acceptance: 0, aovLift: 0, bySurface: {}, byDay: [] },
-        })),
+        dropBackup(
+          patchCampaign(s, id, (c) => ({
+            ...namedAndLinked(c),
+            savedAt: Date.now(),
+            status: c.start && c.start > nowOf(s) ? 'scheduled' : 'running',
+            publishedOn: todayOf(s),
+            metrics: c.metrics ?? { revenue: 0, orders: 0, acceptance: c.offerRefs.length > 0 || c.campaignPrice ? 0 : null, aovLift: 0, bySurface: {}, byDay: [] },
+          })),
+          id,
+        ),
       )
     },
     unpublish(id: string) {
-      update((s) => patchCampaign(s, id, { status: 'draft', publishedOn: undefined }))
+      update((s) => dropBackup(patchCampaign(s, id, { status: 'draft', publishedOn: undefined, savedAt: Date.now() }), id))
     },
     pause(id: string) {
-      update((s) => patchCampaign(s, id, { status: 'paused', pausedSince: todayOf(s) }))
+      update((s) => patchCampaign(s, id, { status: 'paused', pausedSince: nowOf(s) }))
     },
     resume(id: string) {
       update((s) => patchCampaign(s, id, { status: 'running', pausedSince: undefined }))
@@ -291,7 +363,7 @@ function makeActions(update: Updater) {
         if (!c) return s
         let next = s
         for (const ref of c.offerRefs) if (ref.mode === 'campaignOnly') next = deleteOffer(next, ref)
-        return withToast({ ...next, campaigns: next.campaigns.filter((x) => x.id !== id) }, `Deleted ${c.name}. Attached offers are back to their everyday versions.`)
+        return withToast(dropBackup({ ...next, campaigns: next.campaigns.filter((x) => x.id !== id) }, id), `Deleted ${c.name || 'New campaign'}. Attached offers are back to their everyday versions.`)
       })
     },
     /** Clone and Run again: a new draft with empty dates and all offers. */
@@ -327,6 +399,7 @@ function makeActions(update: Updater) {
           pausedSince: undefined,
           endedOn: undefined,
           publishedOn: undefined,
+          savedAt: undefined,
           onSaleDecision: undefined,
           bogoOverlapDecision: undefined,
           countdownOverlapDecision: undefined,
@@ -497,7 +570,7 @@ function omit<T extends object, K extends keyof T>(obj: T, key: K): Omit<T, K> {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(loadState)
-  const update = useCallback<Updater>((fn) => setState((s) => fn(s)), [])
+  const update = useCallback<Updater>((fn) => setState((s) => trackDrafts(s, fn(s))), [])
   const actions = useMemo(() => makeActions(update), [update])
   const api = useMemo(() => ({ state, update, actions }), [state, update, actions])
   useEffect(() => {

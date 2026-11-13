@@ -14,7 +14,7 @@ interface Props {
 }
 
 /**
- * Attach existing offer (brief S2 rail card 3). Every everyday offer, grouped by module.
+ * Attach an existing offer (brief v3.2, S2 step 2). Every everyday offer, grouped by module.
  * An offer in another campaign shows "In [campaign], [dates]."; overlapping windows disable Attach.
  */
 export function AttachExistingDrawer({ open, onClose, campaign, onCustomise }: Props) {
@@ -43,7 +43,7 @@ export function AttachExistingDrawer({ open, onClose, campaign, onCustomise }: P
   const pickedView = picked ? offers.find((o) => o.ref.moduleId === picked.moduleId && o.ref.offerId === picked.offerId) : null
 
   return (
-    <Drawer open={open} onClose={close} title="Attach existing offer" width={620}>
+    <Drawer open={open} onClose={close} title="Attach an existing offer" width={620}>
       <div className="flex flex-col gap-5">
         {pickedView && (
           <div className="rounded-xl border p-3" style={{ borderColor: '#1d4ed8' }}>
@@ -51,7 +51,7 @@ export function AttachExistingDrawer({ open, onClose, campaign, onCustomise }: P
               {pickedView.title} <ModuleChip name={pickedView.chip} />
             </div>
             <div className="mb-2 text-xs text-gray-500">{pickedView.detail}</div>
-            <div className="mb-2 text-xs text-gray-600">How should {campaign.name} use it?</div>
+            <div className="mb-2 text-xs text-gray-600">How should {campaign.name.trim() || 'this campaign'} use it?</div>
             <div className="flex flex-wrap gap-2">
               <button type="button" className="btn btn-blue btn-sm" onClick={useAsIs}>
                 Use as is

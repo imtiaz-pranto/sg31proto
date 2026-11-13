@@ -45,7 +45,7 @@ export function CampaignsList() {
             <div className="text-sm font-semibold">
               {expired ? 'Your StoreGrowth Pro licence has expired, so your campaigns are stopped. Renew it to run them again.' : 'Campaigns is a StoreGrowth Pro feature. This is a preview with sample data.'}
             </div>
-            {!expired && <div className="mt-1 text-xs text-gray-600">Group offers, a campaign price and surfaces from your modules under one schedule, one product scope and one report card.</div>}
+            {!expired && <div className="mt-1 text-xs text-gray-600">Group offers, a campaign price and store displays from your modules under one schedule, one product scope and one report card.</div>}
           </div>
           <ProActionButton />
         </div>
@@ -75,7 +75,7 @@ export function CampaignsList() {
         <Stat label="Campaign revenue" value={fmtMoney(stats.revenue)} sub={`${stats.storeShare}% of store revenue in the period`} note={revenueNote(state.settings.attributionWindowDays)} />
         <Stat label="Campaign orders" value={String(stats.orders)} sub={`across ${counts.All} campaigns`} note="Same rule as revenue" />
         <Stat label="AOV lift during campaigns" value={fmtPct(stats.aovLift)} sub="vs non-campaign days" note="Campaign orders vs the 30 days before" positive={stats.aovLift >= 0} />
-        <Stat label="Best surface" value={stats.bestSurface} sub={`led ${stats.bestSurfaceShare}% of campaign orders`} note="Last surface clicked before a campaign product was added" />
+        <Stat label="Best store display" value={stats.bestSurface} sub={`led ${stats.bestSurfaceShare}% of campaign orders`} note="The last campaign display the shopper used before adding a campaign product" />
       </div>
 
       <section className="card p-4">
@@ -118,7 +118,7 @@ export function CampaignsList() {
               <th>Status</th>
               <th>Runs</th>
               <th>Offers</th>
-              <th>Surfaces</th>
+              <th>Store displays</th>
               <th className="text-right">Revenue</th>
               <th className="text-right">Orders</th>
               <th className="text-right">AOV lift</th>
@@ -139,7 +139,7 @@ export function CampaignsList() {
                 >
                   <td className="font-medium">
                     <span className="flex items-center gap-2">
-                      {c.name}
+                      {c.name || 'New campaign'}
                       {stoppedByLicence(state, c) && <span className="chip chip-warn">Stopped: licence expired</span>}
                       {warn && (
                         <span className="chip chip-warn" title="A module this campaign uses is off">

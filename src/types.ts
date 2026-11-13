@@ -81,7 +81,8 @@ export interface DayPoint {
 export interface CampaignMetrics {
   revenue: number
   orders: number
-  acceptance: number
+  /** Null when the campaign has no offer, shown as "--". */
+  acceptance: number | null
   aovLift: number
   bySurface: Record<string, number>
   byDay: DayPoint[]
@@ -108,9 +109,12 @@ export interface Campaign {
   storeDuring: { revenue: number; dailyChangePct: number } | null
   /** Campaign-level copy that surfaces inherit. */
   message: string
+  /** Date-time the campaign was paused. */
   pausedSince?: string
   endedOn?: string
   publishedOn?: string
+  /** Wall-clock time (ms) of the last Save draft. Unset means "Not saved yet". */
+  savedAt?: number
   /** Readiness decisions the merchant already made. */
   onSaleDecision?: 'exclude' | 'stack'
   bogoOverlapDecision?: 'keep'
@@ -250,6 +254,18 @@ export interface PreviewCart {
   notices: string[]
 }
 
+/**
+ * What a campaign and the offers looked like before an unsaved edit began.
+ * Drafts get one on their first unsaved change; a Setup edit drawer takes one when it opens.
+ * "Leave without saving" and Cancel put it back.
+ */
+export interface EditBackup {
+  campaign: Campaign
+  coupons: SmartCoupon[]
+  bogoRules: BogoRule[]
+  orderBumps: OrderBump[]
+}
+
 export type FreeLimitModule = 'smart-coupons' | 'order-bump' | 'cart-rewards'
 
 export interface AppState {
@@ -264,6 +280,8 @@ export interface AppState {
   /** Date a module was turned off, keyed by module id. */
   moduleOffSince: Partial<Record<ModuleId, string>>
   campaigns: Campaign[]
+  /** Unsaved-edit snapshots, keyed by campaign id. */
+  editBackups: Record<string, EditBackup>
   coupons: SmartCoupon[]
   bogoRules: BogoRule[]
   orderBumps: OrderBump[]

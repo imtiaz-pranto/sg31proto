@@ -1,15 +1,15 @@
 import { useStore } from '../../store/store'
 
-/** Names the version a drawer edits: "Everyday version", "[Campaign] version" or "Campaign-only: [Campaign]". */
+/** Names the version a drawer edits: "Everyday version", "[Campaign] version" or "Made for [Campaign]". */
 export function VersionHeader({ versionCampaignId, campaignOnlyOf }: { versionCampaignId: string | null | undefined; campaignOnlyOf: string | null | undefined }) {
   const { state } = useStore()
   const vc = versionCampaignId ? state.campaigns.find((x) => x.id === versionCampaignId) : null
   const oc = campaignOnlyOf ? state.campaigns.find((x) => x.id === campaignOnlyOf) : null
-  const label = vc ? `${vc.name} version` : oc ? `Campaign-only: ${oc.name}` : 'Everyday version'
+  const label = vc ? `${vc.name} version` : oc ? `Made for ${oc.name.trim() || 'this campaign'}` : 'Everyday version'
   const sub = vc
     ? 'Only what this campaign changes. The everyday version is untouched.'
     : oc
-      ? 'Lives only inside this campaign. It is offline outside the campaign window.'
+      ? 'Made for this campaign. It only runs while the campaign runs.'
       : 'What the module applies whenever no running campaign controls this offer.'
   const blue = vc || oc
   return (

@@ -1,5 +1,28 @@
 import { X } from 'lucide-react'
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
+
+/** Open drawers and dialogs, oldest first. Escape only closes the one on top, so a drawer opened from a drawer closes alone. */
+const openLayers: object[] = []
+
+function useEscapeToClose(open: boolean, onClose: () => void) {
+  const latest = useRef(onClose)
+  useEffect(() => {
+    latest.current = onClose
+  })
+  useEffect(() => {
+    if (!open) return
+    const layer = {}
+    openLayers.push(layer)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && openLayers[openLayers.length - 1] === layer) latest.current()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      openLayers.splice(openLayers.indexOf(layer), 1)
+    }
+  }, [open])
+}
 
 interface DrawerProps {
   open: boolean
@@ -12,12 +35,7 @@ interface DrawerProps {
 
 /** Right-side drawer. Escape closes it. */
 export function Drawer({ open, onClose, title, children, width = 560, footer }: DrawerProps) {
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+  useEscapeToClose(open, onClose)
   if (!open) return null
   return (
     <div className="fixed inset-0 z-40">
@@ -55,12 +73,7 @@ interface ModalProps {
 }
 
 export function Modal({ open, onClose, title, children, width = 880 }: ModalProps) {
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+  useEscapeToClose(open, onClose)
   if (!open) return null
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center p-6">

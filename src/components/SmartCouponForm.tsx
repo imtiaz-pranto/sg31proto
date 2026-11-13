@@ -146,7 +146,7 @@ export function SmartCouponForm({ couponId, versionCampaignId = null, campaignOn
             </div>
           )}
           {c.method === 'link' && <div className="mt-3 text-xs text-gray-500">Shoppers who open the coupon link get the discount applied automatically.</div>}
-          {methodLocked && <div className="mt-2 text-xs text-gray-500">Method and code are read-only in a campaign version. A different code needs a campaign-only coupon.</div>}
+          {methodLocked && <div className="mt-2 text-xs text-gray-500">Method and code are read-only in a campaign version. A different code needs a coupon made for this campaign.</div>}
           {proNudge === 'Link method' && (
             <div className="mt-3">
               <UpgradeCard name="Link method" sentence="Apply a coupon from a URL you share in ads, email or Texty." compact />
@@ -531,7 +531,7 @@ function buildSummary(c: SmartCoupon, state: ReturnType<typeof useStore>['state'
   if (c.type === 'buyXGetY' && c.method !== 'automatic' && c.bogoRuleId) out.push('The BOGO rule only applies with this coupon')
   if (c.campaignOnlyOf) {
     const cmp = state.campaigns.find((x) => x.id === c.campaignOnlyOf)
-    if (cmp) out.push(`Campaign-only, dates set by ${cmp.name}`)
+    if (cmp) out.push(`Made for ${cmp.name.trim() || 'this campaign'}, dates set by the campaign`)
   } else if (c.dates.start || c.dates.end) out.push(fmtRange(c.dates.start, c.dates.end))
   else out.push('No dates set')
   return out

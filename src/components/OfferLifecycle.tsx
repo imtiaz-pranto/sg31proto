@@ -36,15 +36,11 @@ export function ControllingBanner({ k, offer, onEditVersion }: { k: OfferKey; of
   )
 }
 
-export function OfferTag({ offer }: { offer: AnyOffer }) {
-  return <span className="chip chip-module">{offer.origin === 'campaignOnly' ? 'Campaign-only' : 'Attached'}</span>
-}
-
-/** "Campaign-only: [campaign]" chip for module pages. */
+/** "Made for [campaign]" chip for module pages. */
 export function CampaignOnlyChip({ offer }: { offer: AnyOffer }) {
   const { state } = useStore()
   if (offer.origin !== 'campaignOnly') return null
-  return <span className="chip chip-module">Campaign-only: {campaignById(state, offer.campaignOnlyOf)?.name ?? 'deleted campaign'}</span>
+  return <span className="chip chip-module">Made for {campaignById(state, offer.campaignOnlyOf)?.name ?? 'a deleted campaign'}</span>
 }
 
 export function FreeLimitChip() {

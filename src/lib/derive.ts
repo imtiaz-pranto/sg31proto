@@ -157,22 +157,28 @@ export function shortModuleName(id: ModuleId): string {
 
 // ---------- surfaces ----------
 
+/** A store display ("surface" in the data model): somewhere on the store a campaign can show itself. */
 export interface SurfaceDef {
   id: SurfaceId
+  /** Row name on the campaign page. */
   label: string
   moduleId: ModuleId | null
+  /** Short name used in reports and template cards. Matches the keys in metrics.bySurface. */
   short: string
-  note?: string
+  /** Name used in one-line lists, e.g. the Setup summary. */
+  summary: string
+  /** One line on what it shows. */
+  desc: string
 }
 
 export const SURFACES: SurfaceDef[] = [
-  { id: 'countdown', label: 'Countdown Timer', moduleId: 'countdown', short: 'Countdown' },
-  { id: 'floatingBar', label: 'Floating Notification Bar', moduleId: 'floating-bar', short: 'Floating bar' },
-  { id: 'stockBar', label: 'Stock Count Bar', moduleId: 'stock-bar', short: 'Stock bar' },
-  { id: 'salesPop', label: 'Live Sales Notification', moduleId: 'sales-pop', short: 'Sales pop' },
-  { id: 'flyCart', label: 'Fly Cart message', moduleId: 'fly-cart', short: 'Fly cart' },
-  { id: 'cartRewardsBar', label: 'Cart Rewards bar', moduleId: 'cart-rewards', short: 'Cart Rewards bar', note: 'Uses your Cart Rewards milestones. Shows campaign copy on the bar.' },
-  { id: 'badge', label: 'Product Badge', moduleId: null, short: 'Badge' },
+  { id: 'countdown', label: 'Countdown timer', moduleId: 'countdown', short: 'Countdown', summary: 'Countdown timer', desc: 'Counts down to the campaign end on product pages' },
+  { id: 'floatingBar', label: 'Floating notification bar', moduleId: 'floating-bar', short: 'Floating bar', summary: 'Floating bar', desc: 'A bar across the top or bottom of every page' },
+  { id: 'badge', label: 'Product badge', moduleId: null, short: 'Badge', summary: 'Product badge', desc: 'A sale badge on campaign products' },
+  { id: 'salesPop', label: 'Live sales notification', moduleId: 'sales-pop', short: 'Sales pop', summary: 'Live sales notification', desc: 'Pop-ups of recent orders for campaign products' },
+  { id: 'flyCart', label: 'Fly cart message', moduleId: 'fly-cart', short: 'Fly cart', summary: 'Fly cart message', desc: 'A line about the campaign inside the side cart' },
+  { id: 'cartRewardsBar', label: 'Cart rewards bar', moduleId: 'cart-rewards', short: 'Cart Rewards bar', summary: 'Cart rewards bar', desc: 'Your Cart Rewards milestones, with campaign copy on the bar' },
+  { id: 'stockBar', label: 'Stock count bar', moduleId: 'stock-bar', short: 'Stock bar', summary: 'Stock count bar', desc: 'Shows how many are left on campaign products' },
 ]
 
 export function surfaceLock(state: AppState, s: SurfaceDef): LockReason {
@@ -405,9 +411,9 @@ export function timelineChip(state: AppState, key: OfferKey): TimelineChip | nul
     return { text: `${controlling.name} version · ${until}${more(upcoming.length)}`, title }
   }
   const next = upcoming[0] ?? windows[0]
-  const lead = everydayOn(state, key, o) ? 'Live now' : 'Off now'
+  const on = everydayOn(state, key, o)
   const end = next.end ? fmtShortDateTime(next.end) : 'always on'
-  return { text: `${lead} · ${next.name} takes over ${fmtShortDateTime(next.start)} to ${end} · back to everyday after${more(upcoming.length - 1)}`, title }
+  return { text: `${on ? 'Live now' : 'Off now'} · ${next.name} ${on ? 'takes over' : 'turns it on'} ${fmtShortDateTime(next.start)} to ${end} · back to everyday after${more(upcoming.length - 1)}`, title }
 }
 
 // ---------- offer views ----------
@@ -656,6 +662,11 @@ export function surfaceCount(c: Campaign): number {
   return Object.values(c.surfaces).filter((s) => s?.enabled).length
 }
 
+/** Store displays that are switched on and whose module is on, in page order. */
+export function activeSurfaces(state: AppState, c: Campaign): SurfaceDef[] {
+  return SURFACES.filter((s) => c.surfaces[s.id]?.enabled && surfaceLock(state, s) === null)
+}
+
 // ---------- overlap levels (brief 3f) ----------
 
 export interface OverlapChecks {
@@ -697,36 +708,36 @@ export interface ReadinessCheck {
   fixes: { label: string; action: string; arg?: string }[]
 }
 
-/** Rows in the readiness table, info line included. */
-export const READINESS_CHECK_COUNT = 10
-
 export function readinessChecks(state: AppState, c: Campaign): ReadinessCheck[] {
   const out: ReadinessCheck[] = []
   const offers = campaignOffers(state, c)
   const hasDiscount = offers.length > 0 || c.campaignPrice !== null
 
   if (!c.start) {
-    out.push({ id: 'noStart', kind: 'blocking', text: 'Set a start date before publishing.', fixes: [{ label: 'Edit dates', action: 'editDates' }] })
+    out.push({ id: 'noStart', kind: 'blocking', text: 'Set a start date', fixes: [{ label: 'Edit dates', action: 'editDates' }] })
   }
   if (c.start && c.end && c.end < c.start) {
-    out.push({ id: 'dates', kind: 'blocking', text: 'End date is before the start date.', fixes: [{ label: 'Edit dates', action: 'editDates' }] })
+    out.push({ id: 'dates', kind: 'blocking', text: 'End date is before start date', fixes: [{ label: 'Edit dates', action: 'editDates' }] })
   }
   if (!hasAnythingAttached(c) && surfaceCount(c) === 0) {
-    out.push({ id: 'empty', kind: 'blocking', text: 'Nothing attached. Add an offer, a campaign price or a surface.', fixes: [] })
+    out.push({ id: 'empty', kind: 'blocking', text: 'Add an offer, a campaign price or a store display', fixes: [] })
   }
 
   const onSale = onSaleCounts(state, c)
   const coupons = offers.filter((o) => o.moduleId === 'smart-coupons').map((o) => withOverride(state.coupons.find((x) => x.id === o.ref.offerId)!, refIn(c, o.ref)))
   const allCouponsSkipSale = coupons.length > 0 && coupons.every((k) => k.excludeOnSale) && offers.length === coupons.length && !c.campaignPrice
   if (hasDiscount && onSale.length > 0 && !c.onSaleDecision && !allCouponsSkipSale) {
-    const parts = onSale.map((x) => `${x.count} in ${x.category}`).join(', ')
+    const total = onSale.reduce((n, x) => n + x.count, 0)
+    const [first, ...rest] = onSale
+    const parts = [`${first.count} ${first.count === 1 ? 'product' : 'products'} in ${first.category}`, ...rest.map((x) => `${x.count} in ${x.category}`)]
+    const list = parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts[0]
     out.push({
       id: 'onSale',
       kind: 'warning',
-      text: `Products already on sale inside the campaign scope (${parts}). Exclude them, or stack the discount on top.`,
+      text: `${list} ${total === 1 ? 'is' : 'are'} already on sale.`,
       fixes: [
-        { label: 'Exclude', action: 'onSale', arg: 'exclude' },
-        { label: 'Stack', action: 'onSale', arg: 'stack' },
+        { label: 'Exclude them', action: 'onSale', arg: 'exclude' },
+        { label: 'Stack deals', action: 'onSale', arg: 'stack' },
       ],
     })
   }
@@ -763,12 +774,12 @@ export function readinessChecks(state: AppState, c: Campaign): ReadinessCheck[] 
     if (clashes.length > 0) {
       const n = clashes.length
       const head = n === 1 ? '1 product already has its own Countdown discount.' : `${n} products already have their own Countdown discount.`
-      out.push({ id: 'countdownClash', kind: 'warning', text: `${head} The campaign price replaces it while the campaign runs.`, fixes: [{ label: 'Review products', action: 'reviewProducts' }, { label: 'OK', action: 'countdownOk' }] })
+      out.push({ id: 'countdownClash', kind: 'warning', text: `${head} The campaign price replaces it while the campaign runs.`, fixes: [{ label: 'Review', action: 'reviewProducts' }, { label: 'OK', action: 'countdownOk' }] })
     }
   }
 
   if (!hasDiscount) {
-    out.push({ id: 'noDiscount', kind: 'warning', text: 'No discount attached. Attribution will use the link and surface clicks only.', fixes: [{ label: 'Attach offer', action: 'attachOffer' }] })
+    out.push({ id: 'noDiscount', kind: 'warning', text: 'No discount attached. Attribution will use the link and store display clicks only.', fixes: [{ label: 'Attach offer', action: 'attachOffer' }] })
   }
 
   for (const w of campaignModuleWarnings(state, c)) {
@@ -782,13 +793,12 @@ export function readinessChecks(state: AppState, c: Campaign): ReadinessCheck[] 
   return out
 }
 
-/** "Store during campaign" context line. Hidden for always-on, draft and scheduled campaigns. */
-export function storeDuringLine(state: AppState, c: Campaign): string | null {
+/** "Your whole store during this campaign" context numbers. Hidden for always-on, draft and scheduled campaigns. */
+export function storeDuring(state: AppState, c: Campaign): { revenue: number; pct: number } | null {
   if (!c.storeDuring || c.end === null) return null
   const st = effectiveStatus(state, c)
   if (st === 'draft' || st === 'scheduled') return null
-  const pct = c.storeDuring.dailyChangePct
-  return `Store during campaign: ${fmtMoney(c.storeDuring.revenue)}, ${pct > 0 ? '+' : ''}${pct}% a day vs the 30 days before`
+  return { revenue: c.storeDuring.revenue, pct: c.storeDuring.dailyChangePct }
 }
 
 // ---------- attribution copy ----------

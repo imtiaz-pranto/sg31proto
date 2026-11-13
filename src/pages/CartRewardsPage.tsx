@@ -40,7 +40,7 @@ export function CartRewardsPage() {
       </div>
       <div>
         <h1 className="text-xl font-semibold">Cart Rewards</h1>
-        <p className="text-sm text-gray-600">Milestones shoppers unlock as the cart grows, with a progress bar. Campaigns show this bar as a surface with their own copy.</p>
+        <p className="text-sm text-gray-600">Milestones shoppers unlock as the cart grows, with a progress bar. Campaigns show this bar as a store display with their own copy.</p>
       </div>
 
       <FreeLimitNotice module="cart-rewards" />

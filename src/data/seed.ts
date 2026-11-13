@@ -1,4 +1,4 @@
-// Seed data for the StoreGrowth 3.1 prototype. Matches brief v3.1 section 8.
+// Seed data for the StoreGrowth 3.1 prototype. Matches brief v3.2 section 8.
 // Everything here is sample data. Numbers are literal so reviewers can edit by hand.
 
 import type { AppState, BogoRule, Campaign, CartRewardsConfig, Module, Order, OrderBump, Product, Settings, SmartCoupon } from '../types'
@@ -143,14 +143,14 @@ export const campaigns: Campaign[] = [
     metrics: {
       revenue: 2140,
       orders: 47,
-      acceptance: 41,
+      acceptance: 34,
       aovLift: 22,
       bySurface: { 'Fly cart': 18, 'Floating bar': 11, Countdown: 9, Badge: 5, Link: 3, Direct: 1 },
       byDay: [
-        { date: '2026-11-03', revenue: 380 },
+        { date: '2026-11-03', revenue: 460 },
         { date: '2026-11-04', revenue: 520 },
-        { date: '2026-11-05', revenue: 610 },
-        { date: '2026-11-06', revenue: 630 },
+        { date: '2026-11-05', revenue: 590 },
+        { date: '2026-11-06', revenue: 570 },
       ],
     },
   },
@@ -227,13 +227,13 @@ export const campaigns: Campaign[] = [
     metrics: {
       revenue: 4910,
       orders: 118,
-      acceptance: 48,
+      acceptance: 41,
       aovLift: 17,
-      bySurface: { 'Fly cart': 46, 'Floating bar': 29, Countdown: 21, Badge: 12, Link: 6, Direct: 4 },
+      bySurface: { 'Fly cart': 41, 'Floating bar': 28, Countdown: 22, 'Sales pop': 12, Badge: 9, Link: 4, Direct: 2 },
       byDay: [
-        { date: '2026-10-29', revenue: 1420 },
-        { date: '2026-10-30', revenue: 1690 },
-        { date: '2026-10-31', revenue: 1800 },
+        { date: '2026-10-29', revenue: 1380 },
+        { date: '2026-10-30', revenue: 1560 },
+        { date: '2026-10-31', revenue: 1970 },
       ],
     },
   },
@@ -254,7 +254,7 @@ export const campaigns: Campaign[] = [
     baseline: baseline(3260, 64, 26),
     storeDuring: { revenue: 9140, dailyChangePct: 12 },
     publishedOn: '2026-08-15',
-    metrics: { revenue: 3260, orders: 64, acceptance: 33, aovLift: 26, bySurface: { 'Fly cart': 27, 'Floating bar': 19, Badge: 11, Link: 5, Direct: 2 }, byDay: [] },
+    metrics: { revenue: 3260, orders: 64, acceptance: 29, aovLift: 26, bySurface: { 'Fly cart': 27, 'Floating bar': 19, Badge: 11, Link: 5, Direct: 2 }, byDay: [] },
   },
   {
     id: 'cmp-summer',
@@ -273,7 +273,7 @@ export const campaigns: Campaign[] = [
     baseline: baseline(1730, 32, -4),
     storeDuring: { revenue: 5020, dailyChangePct: -6 },
     publishedOn: '2026-07-18',
-    metrics: { revenue: 1730, orders: 32, acceptance: 29, aovLift: -4, bySurface: { 'Fly cart': 12, 'Floating bar': 8, 'Stock bar': 7, Badge: 3, Link: 1, Direct: 1 }, byDay: [] },
+    metrics: { revenue: 1730, orders: 32, acceptance: 22, aovLift: -4, bySurface: { 'Fly cart': 12, 'Floating bar': 8, 'Stock bar': 7, Badge: 3, Link: 1, Direct: 1 }, byDay: [] },
   },
   {
     id: 'cmp-eid',
@@ -292,7 +292,7 @@ export const campaigns: Campaign[] = [
     baseline: baseline(2480, 58, 11),
     storeDuring: { revenue: 4310, dailyChangePct: 19 },
     publishedOn: '2026-05-30',
-    metrics: { revenue: 2480, orders: 58, acceptance: 36, aovLift: 11, bySurface: { 'Floating bar': 24, Countdown: 14, Badge: 9, Link: 8, Direct: 3 }, byDay: [] },
+    metrics: { revenue: 2480, orders: 58, acceptance: 31, aovLift: 11, bySurface: { 'Floating bar': 24, Countdown: 14, Badge: 9, Link: 8, Direct: 3 }, byDay: [] },
   },
   {
     id: 'cmp-spring',
@@ -311,7 +311,7 @@ export const campaigns: Campaign[] = [
     baseline: baseline(1120, 21, 3),
     storeDuring: { revenue: 2890, dailyChangePct: 5 },
     publishedOn: '2026-03-08',
-    metrics: { revenue: 1120, orders: 21, acceptance: 0, aovLift: 3, bySurface: { 'Floating bar': 8, Countdown: 5, Badge: 4, Link: 3, Direct: 1 }, byDay: [] },
+    metrics: { revenue: 1120, orders: 21, acceptance: null, aovLift: 3, bySurface: { 'Floating bar': 8, Countdown: 5, Badge: 4, Link: 3, Direct: 1 }, byDay: [] },
   },
 ]
 
@@ -341,7 +341,8 @@ export function emptyCart(): AppState['preview'] {
 }
 
 export function makeSeedState(): AppState {
-  // Deep-copy so "Reset seed" restores pristine data.
+  // Deep-copy so "Reset seed" restores pristine data. Seeded drafts count as saved when the seed loads.
+  const savedAt = Date.now()
   return structuredClone({
     licence: 'pro',
     licenceExpiresAt: LICENCE_EXPIRES_AT,
@@ -350,7 +351,8 @@ export function makeSeedState(): AppState {
     preview: emptyCart(),
     modules,
     moduleOffSince: { 'stock-bar': '2026-10-28' },
-    campaigns,
+    campaigns: campaigns.map((c) => (c.status === 'draft' ? { ...c, savedAt } : c)),
+    editBackups: {},
     coupons,
     bogoRules,
     orderBumps,

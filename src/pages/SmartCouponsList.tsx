@@ -30,13 +30,13 @@ export function SmartCouponsList() {
       const cmp = campaignById(state, c.campaignOnlyOf)
       return (
         <span>
-          Campaign-only:{' '}
+          Made for{' '}
           {cmp ? (
             <Link to={`/campaigns/${cmp.id}`} className="text-blue-700 hover:underline" onClick={(e) => e.stopPropagation()}>
               {cmp.name}
             </Link>
           ) : (
-            'deleted campaign'
+            'a deleted campaign'
           )}
         </span>
       )

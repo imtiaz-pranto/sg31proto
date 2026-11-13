@@ -28,7 +28,7 @@ export function TemplatePicker({ open, onClose, onPick }: Props) {
                   {t.offerLine}
                 </div>
                 <div>
-                  <span className="text-gray-500">Surfaces: </span>
+                  <span className="text-gray-500">Store displays: </span>
                   {surfaces.length ? surfaces.join(', ') : 'None'}
                 </div>
                 {t.note && <div className="mt-1 text-gray-500">{t.note}</div>}

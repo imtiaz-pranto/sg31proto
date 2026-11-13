@@ -32,8 +32,8 @@ export function ModulesPage() {
               <div className="mt-auto flex items-center gap-2 pt-1 text-xs">
                 <span className="text-gray-500">
                   {m.role === 'offer' && 'Offer source'}
-                  {m.role === 'surface' && 'Surface'}
-                  {m.role === 'both' && 'Offer source (campaign price) and surface'}
+                  {m.role === 'surface' && 'Store display'}
+                  {m.role === 'both' && 'Offer source (campaign price) and store display'}
                   {m.role === 'none' && 'Not used by campaigns'}
                 </span>
                 {link && (

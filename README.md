@@ -26,7 +26,7 @@ The dark **Prototype** button in the bottom-right corner opens the reviewer pane
 
 ## Acceptance walkthrough
 
-The acceptance walkthrough is section 10 of `docs/storegrowth-3.1-prototype-brief-v3.1.md`. All 17 steps pass from Reset seed.
+The acceptance walkthrough is section 10 of `docs/storegrowth-3.1-prototype-brief-v3.2.md`. All 24 steps pass: steps 1 to 17 in one run from Reset seed, then steps 18 to 24 in a second run from Reset seed.
 
 ## State
 
@@ -36,5 +36,7 @@ No backend, no WooCommerce, mock data only.
 
 ## Docs
 
-- `docs/storegrowth-3.1-prototype-brief-v3.1.md` is the current brief.
+- `docs/storegrowth-3.1-prototype-brief-v3.2.md` is the current brief: v3.1 merged with the campaign page redesign.
+- `docs/storegrowth-3.1-prototype-brief-v3.1.md` is the brief before the redesign, kept for reference.
+- `docs/campaign-page-redesign/` holds the redesign brief and the six design screens.
 - `docs/archive/` holds the earlier briefs: v1, v2, the v3 patch and the merged v3.

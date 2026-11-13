@@ -116,7 +116,7 @@ export function StorefrontPage() {
             <span>Also apply {forcedCoupon.title}</span>
           </label>
         )}
-        {campaign && !live && <span className="rounded bg-amber-500/20 px-2 py-0.5 text-xs text-amber-200">This campaign is not in effect, so its surfaces are hidden.</span>}
+        {campaign && !live && <span className="rounded bg-amber-500/20 px-2 py-0.5 text-xs text-amber-200">This campaign is not in effect, so its store displays are hidden.</span>}
         <span className="ml-auto">
           <TimePill />
         </span>

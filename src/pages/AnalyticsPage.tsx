@@ -2,7 +2,7 @@ import { SurfaceBars } from '../components/ui/Charts'
 import { fmtMoney, fmtPct } from '../lib/derive'
 import { useStore } from '../store/store'
 
-/** Analytics. Surface totals across every campaign that has reported orders. */
+/** Analytics. Store display totals across every campaign that has reported orders. */
 export function AnalyticsPage() {
   const { state } = useStore()
   const bySurface: Record<string, number> = {}
@@ -15,13 +15,13 @@ export function AnalyticsPage() {
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-xl font-semibold">Analytics</h1>
-        <p className="text-sm text-gray-600">Which surfaces led to sales across all campaigns.</p>
+        <p className="text-sm text-gray-600">What led to sales across all campaigns.</p>
       </div>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="card p-4">
-          <h2 className="mb-3 text-sm font-semibold">Which surface led to the sale</h2>
+          <h2 className="mb-3 text-sm font-semibold">What led to the sale</h2>
           <SurfaceBars data={bySurface} />
-          <div className="mt-2 text-[11px] text-gray-500">Last surface clicked before a campaign product was added. None counts as Direct.</div>
+          <div className="mt-2 text-[11px] text-gray-500">Orders, by the last campaign display the shopper used. None counts as Direct.</div>
         </section>
         <section className="card">
           <table className="w-full text-sm">
